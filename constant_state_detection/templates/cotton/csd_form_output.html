@@ -1,0 +1,134 @@
+{# output the form errors #}
+{% comment %}
+HTMX only looks at top-level elements in the
+server response for OOB swaps. If your OOB element
+is nested inside another tag in the response,
+it won't be processed
+{% endcomment %}
+{% if messages %}
+
+{# django show messages in <p></p> daisyui #}
+<div class="mb-8 max-w-2xl mx-auto bg-base-100 p-8 rounded-2xl shadow-xl space-y-5"
+     >
+
+    {% for message in messages %}
+        <p class=" mb-1
+                {% if message.tags == 'success' %}text-success
+                {% elif message.tags == 'error' %}text-error
+                {% elif message.tags == 'warning' %}text-warning
+                {% elif message.tags == 'info' %}text-info
+                {% else %}text-base-content{% endif %}">
+                {{ message|safe }}
+            </p>
+    {% endfor %}
+</div>
+
+{# daisyUI Toast container pinned to the top-end (top-right) start #}
+<div class="toast toast-top toast-end z-50">
+    {% for message in messages %}
+    <!--
+      Hyperscript behaviors:
+      1. on load wait 5s then remove me -> Auto-deletes toast after 5 seconds
+      2. on click remove me             -> Dismisses toast immediately when clicked
+    -->
+    <div role="alert"
+         class="alert
+                {% if message.tags == 'success' %}alert-success
+                {% elif message.tags == 'error' %}alert-error
+                {% elif message.tags == 'warning' %}alert-warning
+                {% else %}alert-info{% endif %}
+                cursor-pointer transition-all duration-300"
+                _="on load wait 5s then remove me
+            on click remove me">
+
+        <!-- Status Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+            {% if message.tags == 'success' %}
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            {% elif message.tags == 'error' %}
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            {% else %}
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            {% endif %}
+        </svg>
+
+        <!-- Message Content -->
+        <span>{{ message|safe }}</span>
+    </div>
+    {% endfor %}
+    {# daisyUI Toast container pinned to the top-end (top-right) finish #}
+</div>
+
+{% else %} {# if not messages #}
+    {% if algo_output.x %}
+    <script>
+        // google:
+        // plotly hx-swap-oob django
+
+        // plotly.js with htmx oob swap drawing is wrong
+        // srcipt content is in the curly braces
+        // to fix the Redeclaration Error caused
+        // by HTMX
+        // googled for
+        // htmx redeclares js variables
+
+        delete globalThis.xData123_new;
+        xData123_new = [
+            {% for x in algo_output.x %}
+                {{ x }},
+            {% endfor %}
+            ];
+
+        delete globalThis.yData123_new;
+        yData123_new = [
+            {% for y in algo_output.y %}
+                {{ y }},
+            {% endfor %}
+            ];
+
+        delete globalThis.startData123_new;
+        startData123_new = [
+            {% for x in algo_output.start %}
+                {{ x }},
+            {% endfor %}
+            ];
+
+        delete globalThis.finishData123_new;
+        finishData123_new = [
+            {% for x in algo_output.finish %}
+                {{ x }},
+            {% endfor %}
+            ];
+
+        delete globalThis.startSectionData123_new;
+        startSectionData123_new = [
+            {% for x in algo_output.start_section_series %}
+                {{ x }},
+            {% endfor %}
+            ];
+
+        delete globalThis.finishSectionData123_new;
+        finishSectionData123_new = [
+            {% for x in algo_output.finish_section_series %}
+                {{ x }},
+            {% endfor %}
+            ];
+    </script>
+
+    <c-csd-section-table
+    main_header="The constant section(s) detected"
+    secondary_header="{{ algo_output.csd_sections|length }} constant section(s) detected"
+    :table_data="algo_output.csd_sections"
+    >
+    </c-csd-section-table>
+
+    <c-csd-section-table
+    main_header="The region(s) of uninterrupted constant section detected"
+    secondary_header="{{ algo_output.csd_regions|length }} region(s) of uninterrupted constant section detected"
+    :table_data="algo_output.csd_regions"
+    >
+    </c-csd-section-table>
+
+    {% endif %}
+{% endif %}
+

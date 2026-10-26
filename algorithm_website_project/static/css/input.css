@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@source not "./tailwindcss";
+@source not "./daisyui{,*}.mjs";
+
+@plugin "./daisyui.mjs";
+
+@source "../../../../constant_state_detection/templates";
+

@@ -1,0 +1,147 @@
+{% load static %}
+<div class="max-w-2xl mx-auto bg-base-100 p-8 rounded-2xl shadow-xl space-y-8
+text-base font-medium text-base-content">
+    <p class="text-lg">
+
+        There is the author's article
+        <a href="https://figshare.com/articles/preprint/The_effective_algorithm_for_constant_state_detection_in_time_series_V_2_3_/28375532?file=56562641"
+           class="link link-info font-bold"
+        >
+            The effective algorithm for constant state detection in time series
+        </a>
+        with the basic description of the
+        algorithm for Constant State Detection. You
+        can read and/or download the article using the provided
+        link.
+    </p>
+    <p>The article introduces a simple and effective algorithm for
+        constant state detection in the time series. The algorithm,
+        based on the sliding window of variable length,
+        finds all the sections of the time series which have
+        length greater or equal than some given minimal
+        length and have difference between maximal and minimal
+        value in the section less or equal than some given value.
+        It is shown that the computational complexity of the
+        aforementioned algorithm is $O(N \log(N))$, where $N$ is the
+        length of time series.
+    </p>
+    <p>
+        Actually this algorithm works as two-way one, because
+        the sliding window start and finish indexes are moving
+        quite independently one from another taking into account
+        the maximal window height and the minimal window width
+        restriction.
+    </p>
+    <p class="text-2xl font-bold mb-6 text-center">
+        Algorithm implementation presented on the website
+        can be divided in two main categories:
+    </p>
+    <p class="ml-8 text-2xs font-bold mb-6">
+        Algorithm with absolute window height. In this case
+        the maximal window height restriction used as it is
+        described in the referenced article.
+    </p>
+    <p class="ml-8 text-2xs font-bold mb-6">
+        Algorithm with relative window height.
+        In this case software
+        will calculate maximal ($max$) and minimal ($min$) values
+        of the timeseries, then it will search
+        windows with the allowed maximal window height value equal to
+        <br>$(max - min) h_r$ where $h_r$ is the
+        relative window height that you will provide in the
+        input form.
+    </p>
+    <p class="text-2xl font-bold mb-6 text-center">
+        The model data for a time series.
+    </p>
+    <p class="ml-8 text-2xs font-bold mb-6">
+        The timeseries for a model data are calculating
+        as a sum of two sines. <br/>
+        $f(x_i) = sin(x_i) + \beta  sin(2 x_i + \pi \phi)$
+        <br/>
+            where $ x_i = 2 \pi i / {{ MAX_POINTS_CSD }} $
+        <br/>
+            where $i \in \{0, 1, \ldots {{ MAX_POINTS_CSD_1}} \}$
+        <br/>
+    </p>
+
+    <p class="text-2xl font-bold mb-6 text-center">
+        You also can use your own data with this website.
+    </p>
+    <p class="ml-8 text-2xs font-bold mb-6">
+        You can upload and use your own data to
+        check how the constant state section are found in the case
+        of your specific data. The csv file format
+        is floating-point, one-column one, without headers.
+        You can download the csv file example
+        {% comment %}
+        <a class="link link-info font-bold"
+           target="_blank"
+           href="{% static 'csv/csd_app/256_points_1_periods.csv' %}">
+           using this link.
+        </a>
+        {% endcomment %}
+        {# https://github.com/dakixr/htmx-download/tree/main #}
+
+        <span hx-get="{% url 'csd_algo:csd_download_csv_example' %}"
+                hx-ext="htmx-download"
+                class="link link-primary">
+            using this link.
+          {# <img class="htmx-indicator" src="/spinner.gif"> #}
+        </span>
+
+        The maximal file size to upload is
+        {{ max_upload_file_size_kb }} kB, the maximal data point count
+        is {{ MAX_POINTS_CSD }}.
+    </p>
+    <p>
+        You can explore the plot of the function with
+        the constant section(s) and the tables with the
+        found constant section location, regions of uninterrupted constant
+        section and their length.
+    </p>
+    <p>
+        Use the menu item <strong>Constant state detection</strong>
+        located on the (more or less) top right of the webpage to access
+        the algorithm demo forms.
+    </p>
+    <p class="text-3xl font-bold mb-6 text-center">
+        Also, you can use the next references for the website
+        navigation:
+    </p>
+        <p class="text-2xl font-bold mb-6 text-center">
+            The algorithm implementation for
+                the model data with absolute window height
+                <a class="link link-info"
+                        href="{% url 'csd_algo:csd_model_abs_wnd_h' %}">
+                              is here.</a>
+        </p>
+        <p class="text-2xl font-bold mb-6 text-center">
+            The algorithm implementation for
+                the model data with relative window height
+                <a class="link link-info"
+                        href="{% url 'csd_algo:csd_model_rel_wnd_h' %}">
+                              is here.</a>
+        </p>
+        <p class="text-2xl font-bold mb-6 text-center">
+        The algorithm implementation where
+            you can upload your data for the absolute window height
+            <a class="link link-info"
+                    href="{% url 'csd_algo:csd_userdata_abs_wnd_h' %}">
+                          is here.</a>
+    </p>
+    <p class="text-2xl font-bold mb-6 text-center">
+        The algorithm implementation where
+            you can upload your data for the relative window height
+            <a class="link link-info"
+               href="{% url 'csd_algo:csd_userdata_rel_wnd_h' %}">
+                          is here.</a>
+    </p>
+
+    <p class="text-2xl font-bold mb-6 text-center bg-accent">
+        If you think you see a bug, a typo, or you'd like to use
+        the algorithm software presented on this website
+        to process a big chunk of your data, please let me know.
+    </p>
+
+</div>

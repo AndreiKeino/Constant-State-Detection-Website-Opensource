@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en"  data-theme="light">
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="htmx-config" content='{"scrollBehavior":"smooth"}'>
+    {# <meta name="htmx-config" content='{"allowNestedOobSwaps":true}'> #}
+    <meta name="description" content="Playground for algorithm for the
+    constant state detection in time series" />
+
+    <title>{% block title %}Constant state detection in time series.{% endblock %}</title>
+
+    <script src="{% static 'js/_hyperscript.0.9.14/_hyperscript.min.js' %}"></script>
+    <script src="{% static 'js/htmx.2.0.8/htmx.min.js' %}"></script>
+    <script src="{% static 'js/htmx.2.0.8/htmx-download.js' %}"></script>
+
+    <script src="{% static 'js/plotly/plotly-3.4.0.min.js' %}"></script>
+
+    {% comment %}
+    <link href="{% static 'css/output.css' %}" rel="stylesheet" type="text/css" />
+    {% endcomment %}
+
+    {# use daisyui from cdn https://daisyui.com/docs/cdn/ #}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" type="text/css" />
+
+    <!-- https://docs.mathjax.org/en/v4.0/web/start.html -->
+     <!-- https://docs.mathjax.org/en/stable/web/hosting.html#web-hosting -->
+
+    <script>
+        MathJax = 
+        {
+            tex: 
+            {
+                inlineMath: {'[+]': [['$', '$']]}
+            }
+        };
+        /*
+      window.addEventListener('click', function(e) {
+        document.querySelectorAll('.dropdown').forEach(function(dropdown) {
+          if (!dropdown.contains(e.target)) {
+            // Click was outside the dropdown, close it
+            dropdown.open = false;
+          }
+
+
+        });
+      });
+      */
+    </script>
+    <!--
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.0.0/tex-mml-chtml.js"></script>    
+    -->
+
+    <script src="{% static 'js/mathjax.4.11/tex-mml-chtml.js' %}"></script>
+    <script src="{% static 'js/constant_state_detection/plot_csd_results.js' %}"></script>
+
+   <style>
+
+     {% comment %}
+     <!--
+     HTMX relies on an explicit CSS rule to toggle indicators.
+     Ensure this block is loaded in your base Django template
+     styling (or included in your CSS setup):
+     -->
+     {% endcomment %}
+      /* Hide the indicator by default; show it while the form (or any ancestor) is in htmx-request state */
+      .htmx-request .submit-indicator { display: inline-flex !important; }
+      .htmx-request.submit-indicator   { display: inline-flex !important; }
+
+      /* Hide button label while submitting so only spinner is visible */
+      .htmx-request .btn-label { display: none; }
+
+       /* Smooth scrolling for anchor links */
+        html { scroll-behavior: smooth; }
+
+        /* Style for the JS disabled warning box  */
+        .noscript-warning {
+            background-color: #ffdddd;
+            border: 1px solid #ff0000;
+            color: #d8000c;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        /* Style for the Django form errors  */
+      .errorlist {
+          color: #dc3545; /* Bootstrap's 'danger' red color */
+          margin-top: 0.25rem; /* Optional: adds a little spacing */
+          list-style: none;
+      }
+
+      /* Optional: Add a red border to the input field itself */
+      .error input,
+      .error select,
+      .error textarea {
+      border-color: #dc3545;          
+      }
+
+             /*  css to  hide arrows */
+      input.no-arrows::-webkit-outer-spin-button,
+      input.no-arrows::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      input.no-arrows {
+        -moz-appearance: textfield;
+      }
+
+      /*
+        When body.htmx-request is active, it injects a full-screen
+        pseudo-element that visually dims the page and blocks all clicks
+        and interaction.
+       */
+     /* Create a full-page blocking overlay while an HTMX request is active */
+      body.htmx-request::before {
+          content: "";
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background-color: rgba(255, 255, 255, 0.08); /* Dims the page */
+          cursor: wait;                               /* Shows a loading spinner cursor */
+          z-index: 99999;                             /* Keeps it above all elements */
+          pointer-events: auto;                        /* Traps clicks so the user cannot click buttons */
+      }
+
+      /* Optional: Optional greyed-out effect for the elements behind the overlay */
+     {# comment #}
+      body.htmx-request > * {
+          filter: grayscale(40%) blur(0.5px);
+          opacity: 0.7;
+          pointer-events: none; /* Secondary layer to disable underlying links/inputs */
+      }
+     {# endcomment #}
+    </style>
+
+</head>
+
+<script type="text/hyperscript">
+  {# for mathjax to work properly: - not working #}
+  {# googled for #}
+  {# mathjax 4 is working only after page refresh htmx _hyperscript global hook #}
+  def typesetMath()
+    if window.MathJax and window.MathJax.typeset
+      call window.MathJax.typeset()
+    end
+  end
+
+  on htmx:afterSettle
+    call typesetMath()
+  end
+
+  on htmx:swapError
+    call typesetMath()
+  end
+</script>
+
+<body class="bg-base-200 flex flex-col min-h-screen"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-boost="true"
+        hx-indicator="body"
+        {# hx-disabled-elt="input, button, select, textarea" #}
+      {# for mathjax to work properly: - not working #}
+      {# googled for #}
+      {# mathjax 4 is working only after page refresh _hyperscript #}
+      {% comment %}
+      _="on init call MathJax.typeset()
+      then call alert('load')"
+      {% endcomment %}
+>
+
+    <noscript>
+        <div class="noscript-warning">
+            <strong>JavaScript is disabled!</strong><br>
+            This application requires JavaScript to function. 
+            Please enable it in your browser settings.
+        </div>
+    </noscript>
+
+  <!-- ========================================== -->
+  <!-- RESPONSIVE NAVBAR WITH MULTILEVEL MENU     -->
+  <!-- ========================================== -->
+  <div class="drawer">
+    <input id="main-drawer" type="checkbox" class="drawer-toggle" />
+
+    <!-- Page Content Wrapper -->
+    <div class="drawer-content flex flex-col">
+
+      <!-- Navbar -->
+      <div class="navbar bg-base-100 shadow-md sticky top-0 z-50">
+        <!-- Mobile Hamburger Button -->
+        <div class="flex-none lg:hidden">
+          <label for="main-drawer" aria-label="open sidebar" class="btn btn-square btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </label>
+        </div>
+
+        <!-- Logo -->
+        <div class="flex-1">
+          <a href="{% url 'csd_algo:index' %}"
+             class="btn btn-ghost text-2xl font-bold text-primary">
+            Home
+          </a>
+        </div>
+
+        {# <!-- Desktop Menu (Hidden on mobile) --> #}
+        <div class="flex-none hidden lg:block z-999 overflow-visible">
+          <ul class="menu menu-horizontal px-1 font-medium">
+            <!-- Multilevel Menu Item 1 -->
+            <li>
+              <details >
+                <summary>Constant State Detection</summary>
+                <ul class="p-2 bg-base-100 rounded-t-none z-50 shadow-lg min-w-max">
+                  <li><a href="{% url 'csd_algo:index' %}">Introduction to algorithm</a></li>
+                  {# Nested Multilevel #}
+                  <li>
+                    <details >
+                      <summary>Model data</summary>
+                      <ul class="p-2 bg-base-100 z-50 shadow-lg min-w-max">
+                        <li><a href="{% url 'csd_algo:csd_model_abs_wnd_h' %}">
+                          Absolute window height</a></li>
+                        <li><a href="{% url 'csd_algo:csd_model_rel_wnd_h' %}">
+                          Relative window height</a></li>
+                      </ul>
+                    </details>
+                    <details >
+                      <summary>Try algorithm on your own data</summary>
+                      <ul class="p-2 bg-base-100 rounded-t-none z-50 shadow-lg min-w-max">
+                        <li><a href="{% url 'csd_algo:csd_userdata_abs_wnd_h' %}">Absolute window height</a></li>
+                        <li><a href="{% url 'csd_algo:csd_userdata_rel_wnd_h' %}">Relative window height</a></li>
+                      </ul>
+                    </details>
+                  </li>
+                </ul>
+              </details>
+            </li>
+            <li><a href="{% url 'terms-of-service' %}">Terms of service</a></li>
+            <li><a href="{% url 'contacts' %}">Contacts</a></li>
+            <li><a href="{% url 'about_us' %}">About us</a></li>
+          </ul>
+        </div>
+        {# <!-- End of the Desktop Menu (Hidden on mobile) --> #}
+      </div>
+      <main class="min-h-screen flex flex-col justify-between px-5 py-12 ">
+            {% block content %}
+            <!-- Child templates inject content here -->
+            {% endblock %}
+
+<!-- ========================================== -->
+      <!-- FOOTER                                     -->
+      <!-- ========================================== -->
+      <footer class="bg-neutral text-neutral-content position-sticky bottom-0 overflow-visible">
+        {% comment %}
+      <!-- <footer class="bg-neutral text-neutral-content"> -->
+      <!-- <footer class="footer sm:footer-horizontal bg-neutral text-neutral-content p-10"> -->
+
+        <div class="footer p-10 grid grid-cols-1 md:grid-cols-4 gap-8">
+          <aside>
+            <svg width="50" height="50" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" class="fill-current text-primary mb-2">
+              <path d="M22.672 15.226l-2.432.811.841 2.515c.33 1.019-.209 2.127-1.23 2.456-1.15.325-2.148-.321-2.463-1.226l-.84-2.518-5.013 1.677.84 2.517c.391 1.203-.434 2.542-1.831 2.542-.88 0-1.601-.564-1.86-1.314l-.842-2.516-2.431.809c-1.135.328-2.145-.317-2.463-1.229-.329-1.018.211-2.127 1.231-2.456l2.432-.809-1.621-4.823-2.432.808c-1.355.384-2.558-.59-2.558-1.839 0-.817.509-1.582 1.327-1.846l2.433-.809-.842-2.515c-.33-1.02.211-2.129 1.232-2.458 1.02-.329 2.13.209 2.461 1.229l.842 2.515 5.011-1.677-.839-2.517c-.403-1.238.484-2.553 1.843-2.553.819 0 1.585.509 1.85 1.326l.841 2.517 2.431-.81c1.02-.33 2.131.211 2.461 1.229.332 1.018-.21 2.126-1.23 2.456l-2.433.809 1.622 4.823 2.433-.809c1.242-.401 2.557.484 2.557 1.838 0 .819-.51 1.583-1.328 1.847m-8.992-6.428l-5.01 1.675 1.619 4.828 5.011-1.674-1.62-4.829z"></path>
+            </svg>
+            <p class="font-bold text-xl">BrandLogo Ltd.</p>
+            <p>Providing reliable tech solutions since 2020.</p>
+          </aside>
+          <nav>
+            <h6 class="footer-title">Services</h6>
+            <a class="link link-hover">Web Design</a>
+            <a class="link link-hover">Development</a>
+            <a class="link link-hover">Marketing</a>
+            <a class="link link-hover">Consulting</a>
+          </nav>
+          <nav>
+            <h6 class="footer-title">Company</h6>
+            <a class="link link-hover">About us</a>
+            <a class="link link-hover">Contact</a>
+            <a class="link link-hover">Jobs</a>
+            <a class="link link-hover">Press kit</a>
+          </nav>
+          <nav>
+            <h6 class="footer-title">Legal</h6>
+            <a class="link link-hover">Terms of use</a>
+            <a class="link link-hover">Privacy policy</a>
+            <a class="link link-hover">Cookie policy</a>
+          </nav>
+        </div>
+        {% endcomment %}
+        <div class="footer footer-center p-4 bg-base-300 text-base-content border-t border-base-content/10">
+          <aside>
+            <p>Copyright © 2026 - All right reserved by Andrei Keino.</p>
+          </aside>
+        </div>
+      </footer>
+
+        </main>
+
+
+    </div>
+
+    <!-- Mobile Drawer Sidebar -->
+    <div class="drawer-side z-50">
+      <label for="main-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+      <ul class="menu p-4 w-80 min-h-full bg-base-100 text-base-content shadow-xl">
+        <!-- Mobile Logo -->
+        {% comment %}
+        <li class="mb-4">
+          {# <span class="text-2xl font-bold text-primary px-4">BrandLogo</span> #}
+          <a href="{% url 'csd_algo:index' %}"
+             class="btn btn-ghost text-2xl font-bold text-primary">
+            Home
+          </a>
+        </li>
+        {% endcomment %}
+
+        <!-- Mobile Menu Items (Using details for multilevel support on touch) -->
+        <li>
+          <a href="{% url 'csd_algo:index' %}"
+             class="btn btn-ghost text-2xl font-bold text-primary">
+            Home
+          </a>
+        </li>
+        <li>
+          <details >
+            <summary>Constant State Detection</summary>
+            <ul>
+              <li><a href="{% url 'csd_algo:index' %}">Introduction to algorithm</a></li>
+              {# <li><a href="#">SEO Optimization</a></li> #}
+              <li>
+                <details >
+                  <summary>Model data</summary>
+                  <ul>
+                    <li><a href="{% url 'csd_algo:csd_model_abs_wnd_h' %}">
+                          Absolute window height</a></li>
+                    <li><a href="{% url 'csd_algo:csd_model_rel_wnd_h' %}">
+                          Relative window height</a></li>
+                  </ul>
+                </details>
+                <details >
+                  <summary>Try algorithm on your own data</summary>
+                  <ul class="p-2 bg-base-100 rounded-t-none z-50 shadow-lg min-w-max">
+                    <li><a href="{% url 'csd_algo:csd_userdata_abs_wnd_h' %}">Absolute window height</a></li>
+                    <li><a href="{% url 'csd_algo:csd_userdata_rel_wnd_h' %}">Relative window height</a></li>
+                  </ul>
+                </details>
+              </li>
+            </ul>
+          </details>
+        </li>
+        <li><a href="{% url 'terms-of-service' %}">Terms of service</a></li>
+        <li><a href="{% url 'contacts' %}">Contacts</a></li>
+        <li><a href="{% url 'about_us' %}">About us</a></li>
+      </ul>
+    </div>
+  </div>
+
+</body>
+</html>

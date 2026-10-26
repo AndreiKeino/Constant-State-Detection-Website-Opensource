@@ -1,0 +1,41 @@
+<div class="text-center mb-16">
+  <h1 class="text-4xl md:text-5xl font-bold mb-4">Constant
+      State Detection
+      <span class="text-primary"> In Time Series</span>
+  </h1>
+</div>
+
+<div class="max-w-2xl mx-auto bg-base-100 p-8 rounded-2xl shadow-xl">
+  <h2 class="text-2xl font-bold mb-6 text-center space-y-8">
+      {{ page_header_text }}
+      {# Constant State Detection algorithm for a model data for the absolute window minimal height #}
+  </h2>
+</div>
+<div class="max-w-xl mx-auto space-y-8 mt-3">
+    <!-- DaisyUI Collapse (Native Details Element) -->
+    <details class="collapse bg-base-200 collapse-arrow shadow-md">
+
+      <!-- Summary (Top Section) -->
+      <summary class="collapse-title flex items-center justify-between font-medium cursor-pointer">
+        <span class="flex items-center gap-3">
+          <!-- Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+          </svg>
+          What's this?
+        </span>
+      </summary>
+
+      <c-csd-algo-intro/>
+      <!-- Content (Bottom Section) -->
+      <div class="collapse-content text-base-content/80">
+        <!-- Bottom Close Button -->
+        <div class="mt-4 flex justify-end border-t border-base-300 pt-4">
+          <button class="btn btn-primary btn-sm"
+                  _="on click remove @open from closest <details/>">
+            Close details
+          </button>
+        </div>
+      </div>
+    </details>
+</div>
