@@ -29,7 +29,7 @@ import os
 # https://discuss.huggingface.co/t/how-to-manage-user-secrets-and-api-keys/67948
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # ALLOWED_HOSTS = []
 
