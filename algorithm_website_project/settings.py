@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure'
+SECRET_KEY = 'django-insecure-0rzz%bn0913b6gd57#hcu9m1$sxb^*++71ldmryu$$24s^(d9&'
 
 import os
 # SECRET_KEY = os.getenv("django secret key")
@@ -31,22 +31,9 @@ import os
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
-HUGGINFACE_DEPLOY = False
-if HUGGINFACE_DEPLOY:
-    # Разрешаем Hugging Face проксировать ваш трафик
-    ALLOWED_HOSTS = ['*']
-
-    # Обязательно для работы статики и сессий за прокси-сервером HF
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-    # Разрешаем отображение сайта внутри iframe на домене Hugging Face
-    X_FRAME_OPTIONS = 'ALLOW-FROM https://huggingface.co/'
-    XS_SHARING_ALLOWED = True
-    import os
-    SECRET_KEY = os.getenv("django-secret-key")
-
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,[::1]").split(",")
 
 # Application definition
 
@@ -67,6 +54,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -143,6 +131,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # constant_state_detection settings:
 

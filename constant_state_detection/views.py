@@ -24,7 +24,6 @@ def upload_file():
 
 def csd_index(request: HttpRequest):
 
-    print('in index(request: HttpRequest)')
     ctx = {}
     add_settings_vals_to_context(ctx)
     return render (request,

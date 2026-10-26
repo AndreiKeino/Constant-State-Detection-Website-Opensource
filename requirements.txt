@@ -2,19 +2,18 @@ annotated-types==0.8.0
 asgiref==3.11.1
 certifi==2026.10.23
 charset-normalizer==3.5.2
-Django
+Django==6.1.2
 django-appconf==1.2.0
 django-cotton==2.7.2
 django-request==1.7.1
-django_compressor==4.6.0
-gunicorn
-idna
+gunicorn==26.2.0
+idna==3.20
 Mako==1.2.3
 MarkupSafe==3.0.3
 narwhals==2.18.0
-numpy
+numpy==2.5.4
 packaging==26.0
-pandas
+pandas==3.1.0
 patsy==1.0.2
 plotly==6.6.0
 plotly-express==0.4.1
@@ -24,6 +23,7 @@ python-dateutil==2.9.0.post0
 rcssmin==1.2.2
 requests==2.34.2
 rjsmin==1.2.5
+scipy==1.18.1
 setuptools==82.0.1
 six==1.17.0
 sqlparse==0.5.5
@@ -32,3 +32,4 @@ typing-inspection==0.4.4
 typing_extensions==4.16.0
 urllib3==2.8.0
 wheel==0.46.3
+whitenoise==6.12.0
