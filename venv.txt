@@ -1,0 +1,63 @@
+***********************************************************************************************
+Installation:
+
+mint install other version of python
+
+https://github.com/pyenv/pyenv
+
+install python 3.12:
+
+pyenv install 3.12
+
+to run python 3.12:
+
+pyenv shell 3.12
+
+***********************************************************************************************
+
+create venv:
+
+pyenv shell 3.12
+
+cd /home/andrei/python_venvs/
+
+
+
+python3 -m venv csd_algo_3_12
+
+***********************************************************************************************
+
+source /home/andrei/python_venvs/csd_algo_3_12/bin/activate
+
+pip install django
+# pip install mako-for-django - no, it's just for python >= 3.13
+# pip install djangomako # not working properly
+# pip install cython
+python -m pip install --upgrade setuptools pip wheel
+# pip install pandas
+
+pip uninstall numpy
+pip install numpy==2.0
+pip install plotly_express
+pip install pydantic
+
+
+install:
+
+python -m pip install -r /home/andrei/MyProjects/Steady-State-Detection_V_2_4/Web_Service_And_Django_Website/src/algorithm_website_project/requirements.txt
+
+***********************************************************************************************
+
+activate venv:
+
+source /home/andrei/python_venvs/algorithm_website_venv/bin/activate
+
+***********************************************************************************************
+
+freeze: 
+
+pip freeze > /home/andrei/MyProjects/Steady-State-Detection_V_2_4/Web_Service_And_Django_Website/src/algorithm_website_project/requirements.txt
+
+
+
+

@@ -76,7 +76,6 @@ def download_and_read_csd_file(request: HttpRequest) -> np.ndarray | None:
         messages.error(
             request,
             f'Error reading your file: {str(e)}')
-    # print('arr eee = ', arr)
     return arr
 
 
@@ -108,7 +107,6 @@ def get_all_csd_form_data(
     if algo_type_str == alg_value_simple:
         algo_type = AlgorithmTypeInner.ALGO_WITHOUT_POSTPROCESSING
 
-    # print(f'algo_type = {algo_type}')
     return (beta, phi, window_min_len, window_max_height, algo_type,
             file_data_arr)
 
@@ -143,7 +141,6 @@ def calc_algo_output(file_data_arr: np.ndarray|None,
             y = np.sin(2.0 * np.pi * periods * x / points)
             # y: np.ndarray = np.zeros([points], np.float64)
             sin2 = b * np.sin(4.0 * np.pi * periods * x / points + phase)
-            # print(f'len(y) = {len(y)}, len(sin2) = {len(sin2)}')
             y += sin2
             file_data_arr = y
 
@@ -162,7 +159,6 @@ def calc_algo_output(file_data_arr: np.ndarray|None,
 
         try:
             jsn = to_jsonable_dict(csd_data)
-            print(f'jsn = {jsn["Algo_Type"]}')
             response = requests.post(URL_CSD_ALGO,
                                      json=jsn)
             out_data = CSD_Data.model_validate(response.json())
