@@ -32,6 +32,11 @@ import os
 DEBUG = False
 
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,[::1]").split(",")
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-0rzz%bn0913b6gd57#hcu9m1$sxb^*++71ldmryu$$24s^(d9&")
 # https://constant-state-detection-website.onrender.com/
 
