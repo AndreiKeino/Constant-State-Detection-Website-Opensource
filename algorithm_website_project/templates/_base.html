@@ -162,6 +162,24 @@
   end
 </script>
 
+<script>
+  {# hide daisyui menu on click outside details summary #}
+  {# https://stackoverflow.com/questions/76786642/daisyui-click-outside-to-close-details-summary-dropdown #}
+    window.addEventListener('click',
+         function(e)
+         {
+            document.querySelectorAll('.dropdown888').forEach(function(dropdown888) {
+            if (!dropdown888.contains(e.target))
+            {
+              // Click was outside the dropdown888, close it
+              dropdown888.open = false;
+            }
+  });
+});
+</script>
+
+
+
 <body class="bg-base-200 flex flex-col min-h-screen"
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
         hx-boost="true"
@@ -217,13 +235,15 @@
           <ul class="menu menu-horizontal px-1 font-medium">
             <!-- Multilevel Menu Item 1 -->
             <li>
-              <details >
-                <summary>Constant State Detection</summary>
+              <details class="dropdown888">
+                <summary>
+                  Constant State Detection
+                </summary>
                 <ul class="p-2 bg-base-100 rounded-t-none z-50 shadow-lg min-w-max">
                   <li><a href="{% url 'csd_algo:index' %}">Introduction to algorithm</a></li>
                   {# Nested Multilevel #}
                   <li>
-                    <details >
+                    <details  class="dropdown888">
                       <summary>Model data</summary>
                       <ul class="p-2 bg-base-100 z-50 shadow-lg min-w-max">
                         <li><a href="{% url 'csd_algo:csd_model_abs_wnd_h' %}">
@@ -232,7 +252,7 @@
                           Relative window height</a></li>
                       </ul>
                     </details>
-                    <details >
+                    <details  class="dropdown888">
                       <summary>Try algorithm on your own data</summary>
                       <ul class="p-2 bg-base-100 rounded-t-none z-50 shadow-lg min-w-max">
                         <li><a href="{% url 'csd_algo:csd_userdata_abs_wnd_h' %}">Absolute window height</a></li>
@@ -328,13 +348,13 @@
           </a>
         </li>
         <li>
-          <details >
+          <details  class="dropdown888">
             <summary>Constant State Detection</summary>
             <ul>
               <li><a href="{% url 'csd_algo:index' %}">Introduction to algorithm</a></li>
               {# <li><a href="#">SEO Optimization</a></li> #}
               <li>
-                <details >
+                <details  class="dropdown888">
                   <summary>Model data</summary>
                   <ul>
                     <li><a href="{% url 'csd_algo:csd_model_abs_wnd_h' %}">
@@ -343,7 +363,7 @@
                           Relative window height</a></li>
                   </ul>
                 </details>
-                <details >
+                <details  class="dropdown888">
                   <summary>Try algorithm on your own data</summary>
                   <ul class="p-2 bg-base-100 rounded-t-none z-50 shadow-lg min-w-max">
                     <li><a href="{% url 'csd_algo:csd_userdata_abs_wnd_h' %}">Absolute window height</a></li>
